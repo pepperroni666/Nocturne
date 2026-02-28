@@ -1,25 +1,24 @@
 import AVFoundation
 
 final class BeatSoundPreviewPlayer {
+    private let sampleLoader: any AudioSampleLoading
     private var engine: AVAudioEngine?
     private var sourceNode: AVAudioSourceNode?
     private var task: Task<Void, Never>?
 
-    private final class PlaybackState: @unchecked Sendable {
-        var samples: [Float] = []
-        var position: Int = 0
-        var isRunning: Bool = false
+    init(sampleLoader: any AudioSampleLoading = LoadAudioSampleUseCase()) {
+        self.sampleLoader = sampleLoader
     }
 
-    func play(sound: Metronome.BeatSound) {
+    func play(sound: Metronome.BeatSound) throws {
         stop()
 
         let audioEngine = AVAudioEngine()
         let format = audioEngine.outputNode.outputFormat(forBus: 0)
         let sampleRate = format.sampleRate
 
-        let accentSamples = Audio.SampleLoader.load(sound: sound, accent: true, sampleRate: sampleRate)
-        let normalSamples = Audio.SampleLoader.load(sound: sound, accent: false, sampleRate: sampleRate)
+        let accentSamples = try sampleLoader.load(named: sound.accentFileName, targetSampleRate: sampleRate)
+        let normalSamples = try sampleLoader.load(named: sound.normalFileName, targetSampleRate: sampleRate)
 
         // Build 4 beats at 120 BPM: accent, normal, normal, normal
         let samplesPerBeat = Int(sampleRate * 60.0 / 120.0)
@@ -35,7 +34,7 @@ final class BeatSoundPreviewPlayer {
             }
         }
 
-        let state = PlaybackState()
+        let state = SamplePlaybackState()
         state.samples = buffer
         state.position = 0
         state.isRunning = true
@@ -61,7 +60,7 @@ final class BeatSoundPreviewPlayer {
 
         audioEngine.attach(node)
         audioEngine.connect(node, to: audioEngine.mainMixerNode, format: format)
-        try? audioEngine.start()
+        try audioEngine.start()
 
         self.engine = audioEngine
         self.sourceNode = node
@@ -83,6 +82,4 @@ final class BeatSoundPreviewPlayer {
         engine = nil
         sourceNode = nil
     }
-
-
 }

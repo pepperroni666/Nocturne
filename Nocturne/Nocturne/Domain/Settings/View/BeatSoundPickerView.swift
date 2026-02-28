@@ -47,7 +47,7 @@ extension Settings {
             previewPlayer?.stop()
             let player = BeatSoundPreviewPlayer()
             previewPlayer = player
-            player.play(sound: sound)
+            try? player.play(sound: sound)
         }
     }
 }
