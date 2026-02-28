@@ -98,8 +98,23 @@ extension Metronome.Effects {
             updateTempo: { await engine.updateTempo(bpm: $0) },
             updateAccentPattern: { await engine.updateAccentPattern($0) },
             updateBeatSound: { await engine.updateBeatSound($0) },
-            loadSettings: { settings.loadMetronome() },
-            saveSettings: { settings.saveMetronome($0, $1, $2) }
+            loadSettings: {
+                let bpm = Int(settings.load("nocturne.bpm") ?? "") ?? 120
+                let beats = Int(settings.load("nocturne.ts.beats") ?? "") ?? 0
+                let noteValue = Int(settings.load("nocturne.ts.noteValue") ?? "") ?? 4
+                let beatSound = BeatSound(rawValue: settings.load("nocturne.beatSound") ?? "") ?? .simple
+                return (
+                    bpm: bpm > 0 ? bpm : 120,
+                    timeSignature: beats > 0 ? .init(beats: beats, noteValue: noteValue) : .fourFour,
+                    beatSound: beatSound
+                )
+            },
+            saveSettings: { bpm, timeSignature, beatSound in
+                settings.save("nocturne.bpm", String(bpm))
+                settings.save("nocturne.ts.beats", String(timeSignature.beats))
+                settings.save("nocturne.ts.noteValue", String(timeSignature.noteValue))
+                settings.save("nocturne.beatSound", beatSound.rawValue)
+            }
         )
     }
 }

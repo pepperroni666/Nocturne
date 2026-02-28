@@ -140,8 +140,22 @@ extension Tuner.Effects {
             stopPitchDetection: { await pitchDetector.stop() },
             playTone: { frequency in try await tonePlayer.play(frequency: frequency) },
             stopTone: { await tonePlayer.stop() },
-            loadSettings: { settings.loadTuner() },
-            saveSettings: { settings.saveTuner($0, $1, $2) }
+            loadSettings: {
+                let instrument = Tuner.Instrument(rawValue: settings.load("nocturne.tuner.instrument") ?? "") ?? .guitar
+                let tuningRaw = settings.load("nocturne.tuner.tuning") ?? ""
+                let a4 = Double(settings.load("nocturne.tuner.a4") ?? "") ?? 440.0
+                let tuning = Tuner.TuningPreset(rawValue: tuningRaw) ?? Tuner.TuningDatabase.defaultTuning(for: instrument)
+                return (
+                    instrument: instrument,
+                    tuning: tuning.instrument == instrument ? tuning : Tuner.TuningDatabase.defaultTuning(for: instrument),
+                    a4: a4 > 0 ? a4 : 440.0
+                )
+            },
+            saveSettings: { instrument, tuning, a4 in
+                settings.save("nocturne.tuner.instrument", instrument.rawValue)
+                settings.save("nocturne.tuner.tuning", tuning.rawValue)
+                settings.save("nocturne.tuner.a4", String(a4))
+            }
         )
     }
 }
