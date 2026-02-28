@@ -117,7 +117,7 @@ extension Tuner.Effects {
 
     static func live(
         pitchDetector: Audio.AVPitchDetector,
-        tonePlayer: Audio.TonePlayerEngine,
+        tonePlayer: any TonePlayer,
         settings: Settings.Effects
     ) -> Tuner.Effects {
         Tuner.Effects(

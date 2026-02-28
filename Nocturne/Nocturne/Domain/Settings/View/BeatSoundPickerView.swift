@@ -7,7 +7,7 @@ extension Settings {
         let selected: Metronome.BeatSound
         let onSelect: (Metronome.BeatSound) -> Void
 
-        @SwiftUI.State private var previewPlayer: BeatSoundPreviewPlayer?
+        @SwiftUI.State private var soundPlayer: Audio.SoundPlayerEngine?
 
         var body: some View {
             ZStack {
@@ -39,15 +39,14 @@ extension Settings {
             .navigationTitle(navigationTitle)
             .navigationBarTitleDisplayMode(.inline)
             .onDisappear {
-                previewPlayer?.stop()
+                Task { await soundPlayer?.stop() }
             }
         }
 
         private func playPreview(_ sound: Metronome.BeatSound) {
-            previewPlayer?.stop()
-            let player = BeatSoundPreviewPlayer()
-            previewPlayer = player
-            try? player.play(sound: sound)
+            let player = soundPlayer ?? Audio.SoundPlayerEngine()
+            soundPlayer = player
+            Task { try? await player.playBeatPreview(sound: sound) }
         }
     }
 }

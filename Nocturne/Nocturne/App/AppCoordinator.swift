@@ -22,7 +22,7 @@ final class AppCoordinator {
 
         let tunerDeps = tunerDependencies ?? Tuner.Effects.live(
             pitchDetector: Audio.AVPitchDetector(),
-            tonePlayer: Audio.TonePlayerEngine(),
+            tonePlayer: Audio.SoundPlayerEngine(),
             settings: sharedSettings
         )
 
