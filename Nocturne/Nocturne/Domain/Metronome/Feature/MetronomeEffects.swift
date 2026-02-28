@@ -87,7 +87,7 @@ extension Metronome.Effects {
 
 extension Metronome.Effects {
     static func live(
-        engine: AVAudioMetronomeEngine,
+        engine: Audio.AVMetronomeEngine,
         settings: UserDefaultsSettingsStore
     ) -> Metronome.Effects {
         Metronome.Effects(
