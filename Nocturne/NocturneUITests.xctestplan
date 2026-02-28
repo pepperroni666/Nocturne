@@ -1,0 +1,24 @@
+{
+  "configurations" : [
+    {
+      "id" : "5EBE1249-2D96-4838-A642-8C357939ED42",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "performanceAntipatternCheckerEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:Nocturne.xcodeproj",
+        "identifier" : "407C6E672F420633000990CC",
+        "name" : "NocturneUITests"
+      }
+    }
+  ],
+  "version" : 1
+}
