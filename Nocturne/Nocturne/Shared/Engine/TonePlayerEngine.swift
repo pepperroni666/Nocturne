@@ -25,9 +25,7 @@ actor TonePlayerEngine: TonePlayerProtocol {
     func play(frequency: Double) async throws -> AsyncStream<Tuner.ToneEvent> {
         await stop()
 
-        let session = AVAudioSession.sharedInstance()
-        try session.setCategory(.playback, mode: .default, options: [.mixWithOthers])
-        try session.setActive(true)
+        try AudioSession.activate()
 
         let engine = AVAudioEngine()
         let format = engine.outputNode.outputFormat(forBus: 0)
