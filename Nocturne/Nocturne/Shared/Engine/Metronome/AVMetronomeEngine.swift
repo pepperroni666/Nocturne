@@ -38,9 +38,8 @@ extension Audio {
             audioState.currentBeat = 0
             audioState.beatsPerMeasure = beatsPerMeasure
 
-            let clicks = Self.loadClicks(for: beatSound, sampleRate: sampleRate)
-            audioState.accentClick = clicks.accent
-            audioState.normalClick = clicks.normal
+            audioState.accentClick = Audio.SampleLoader.load(sound: beatSound, accent: true, sampleRate: sampleRate)
+            audioState.normalClick = Audio.SampleLoader.load(sound: beatSound, accent: false, sampleRate: sampleRate)
 
             audioState.accentPattern = accentPattern
             audioState.isRunning = true
@@ -115,9 +114,8 @@ extension Audio {
         }
 
         func updateBeatSound(_ beatSound: Metronome.BeatSound) {
-            let clicks = Self.loadClicks(for: beatSound, sampleRate: audioState.sampleRate)
-            audioState.accentClick = clicks.accent
-            audioState.normalClick = clicks.normal
+            audioState.accentClick = Audio.SampleLoader.load(sound: beatSound, accent: true, sampleRate: audioState.sampleRate)
+            audioState.normalClick = Audio.SampleLoader.load(sound: beatSound, accent: false, sampleRate: audioState.sampleRate)
         }
 
         func stop() {
@@ -140,74 +138,6 @@ extension Audio {
 
         private func doYieldTick(_ tick: Metronome.Tick) {
             continuation?.yield(tick)
-        }
-
-        nonisolated private static func loadClicks(for beatSound: Metronome.BeatSound, sampleRate: Double) -> (accent: [Float], normal: [Float]) {
-            if let accent = loadWAV(named: beatSound.accentFileName, targetSampleRate: sampleRate),
-               let normal = loadWAV(named: beatSound.normalFileName, targetSampleRate: sampleRate) {
-                return (accent, normal)
-            }
-            // Fallback: synthesized click if WAV loading fails
-            return (
-                accent: generateClick(frequency: 1200, amplitude: 0.8, durationMs: 5, sampleRate: Float(sampleRate)),
-                normal: generateClick(frequency: 880, amplitude: 0.5, durationMs: 5, sampleRate: Float(sampleRate))
-            )
-        }
-
-        nonisolated private static func loadWAV(named name: String, targetSampleRate: Double) -> [Float]? {
-            guard let url = Bundle.main.url(forResource: name, withExtension: "wav") else { return nil }
-            guard let file = try? AVAudioFile(forReading: url) else { return nil }
-            let format = file.processingFormat
-            let frameCount = AVAudioFrameCount(file.length)
-            guard frameCount > 0,
-                  let buffer = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: frameCount) else { return nil }
-            do { try file.read(into: buffer) } catch { return nil }
-
-            // Convert to mono Float array
-            guard let channelData = buffer.floatChannelData else { return nil }
-            let channels = Int(format.channelCount)
-            let frames = Int(buffer.frameLength)
-            var mono = [Float](repeating: 0, count: frames)
-            if channels == 1 {
-                for i in 0..<frames { mono[i] = channelData[0][i] }
-            } else {
-                for i in 0..<frames {
-                    var sum: Float = 0
-                    for ch in 0..<channels { sum += channelData[ch][i] }
-                    mono[i] = sum / Float(channels)
-                }
-            }
-
-            // Resample if needed
-            let sourceSampleRate = format.sampleRate
-            if abs(sourceSampleRate - targetSampleRate) < 1.0 {
-                return mono
-            }
-            let ratio = targetSampleRate / sourceSampleRate
-            let newCount = Int(Double(frames) * ratio)
-            var resampled = [Float](repeating: 0, count: newCount)
-            for i in 0..<newCount {
-                let srcIndex = Double(i) / ratio
-                let low = Int(srcIndex)
-                let frac = Float(srcIndex - Double(low))
-                let high = min(low + 1, frames - 1)
-                resampled[i] = mono[low] * (1 - frac) + mono[high] * frac
-            }
-            return resampled
-        }
-
-        nonisolated private static func generateClick(
-            frequency: Float,
-            amplitude: Float,
-            durationMs: Float,
-            sampleRate: Float
-        ) -> [Float] {
-            let sampleCount = Int(sampleRate * durationMs / 1000.0)
-            return (0..<sampleCount).map { i in
-                let t = Float(i) / sampleRate
-                let envelope = exp(-t * 800)
-                return amplitude * sin(2.0 * .pi * frequency * t) * envelope
-            }
         }
     }
 }
