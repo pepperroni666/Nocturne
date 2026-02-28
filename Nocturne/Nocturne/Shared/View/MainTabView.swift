@@ -5,6 +5,7 @@ struct MainTabView: View {
     let store: Store<Metronome.State, Metronome.Action>
     let tunerStore: Store<Tuner.State, Tuner.Action>
     @State private var selectedTab = 0
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         TabView(selection: $selectedTab) {
@@ -43,6 +44,11 @@ struct MainTabView: View {
             }
             if oldValue == 1 {
                 tunerStore.send(.stopAll)
+            }
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            if newPhase == .inactive || newPhase == .background {
+                store.send(.appBecameInactive)
             }
         }
     }

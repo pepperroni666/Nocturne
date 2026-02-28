@@ -12,8 +12,7 @@ final class AppCoordinator {
     ) {
         let metronomeDeps = metronomeDependencies ?? Metronome.Effects.live(
             engine: AVAudioMetronomeEngine(),
-            settings: UserDefaultsSettingsStore(),
-            lifecycle: UIKitAppLifecycle()
+            settings: UserDefaultsSettingsStore()
         )
 
         metronomeStore = Store(initial: Metronome.State()) { state, action in
@@ -34,7 +33,6 @@ final class AppCoordinator {
 
     func start() {
         metronomeStore.send(.loadSettings)
-        metronomeStore.send(.observeLifecycle)
         tunerStore.send(.loadSettings)
     }
 }
