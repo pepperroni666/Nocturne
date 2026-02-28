@@ -13,13 +13,9 @@ extension Metronome {
         var loadSettings: @Sendable () -> (bpm: Int, timeSignature: TimeSignature, beatSound: BeatSound)
         var saveSettings: @Sendable (Int, TimeSignature, BeatSound) -> Void
 
-        // Lifecycle
-        var lifecycleEvents: @Sendable () async -> AsyncStream<AppLifecycleEvent>
-
         // Stream IDs
         static let tickStreamID = UUID()
         static let persistDebounceID = UUID()
-        static let lifecycleID = UUID()
     }
 }
 
@@ -85,21 +81,6 @@ extension Metronome.Effects {
             return .settingsLoaded(bpm: result.bpm, timeSignature: result.timeSignature, beatSound: result.beatSound)
         }
     }
-
-    func observeLifecycle() -> Effect<Metronome.Action> {
-        let events = lifecycleEvents
-        return .stream(id: Self.lifecycleID) { send in
-            let stream = await events()
-            for await event in stream {
-                switch event {
-                case .willResignActive, .didEnterBackground:
-                    await send(.appBecameInactive)
-                case .didBecomeActive:
-                    await send(.appBecameActive)
-                }
-            }
-        }
-    }
 }
 
 // MARK: - Live
@@ -107,8 +88,7 @@ extension Metronome.Effects {
 extension Metronome.Effects {
     static func live(
         engine: AVAudioMetronomeEngine,
-        settings: UserDefaultsSettingsStore,
-        lifecycle: UIKitAppLifecycle
+        settings: UserDefaultsSettingsStore
     ) -> Metronome.Effects {
         Metronome.Effects(
             startEngine: { bpm, beats, pattern, sound in
@@ -119,8 +99,7 @@ extension Metronome.Effects {
             updateAccentPattern: { await engine.updateAccentPattern($0) },
             updateBeatSound: { await engine.updateBeatSound($0) },
             loadSettings: { settings.load() },
-            saveSettings: { settings.save(bpm: $0, timeSignature: $1, beatSound: $2) },
-            lifecycleEvents: { lifecycle.events }
+            saveSettings: { settings.save(bpm: $0, timeSignature: $1, beatSound: $2) }
         )
     }
 }

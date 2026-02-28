@@ -23,11 +23,9 @@ extension Metronome {
         // System
         case engineTick(beat: Int)
         case appBecameInactive
-        case appBecameActive
         case persistRequested
         case settingsLoaded(bpm: Int, timeSignature: TimeSignature, beatSound: BeatSound)
         case loadSettings
-        case observeLifecycle
         case engineStartFailed
     }
 }
