@@ -116,8 +116,8 @@ extension Tuner.Effects {
 extension Tuner.Effects {
 
     static func live(
-        pitchDetector: AVAudioPitchDetector,
-        tonePlayer: TonePlayerEngine,
+        pitchDetector: Audio.AVPitchDetector,
+        tonePlayer: Audio.TonePlayerEngine,
         settings: UserDefaultsSettingsStore
     ) -> Tuner.Effects {
         Tuner.Effects(
