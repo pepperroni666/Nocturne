@@ -1,0 +1,41 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(tree -L 3 -I '.git' /Users/arinaruslanovna/nocturne 2>/dev/null || find /Users/arinaruslanovna/nocturne -type d -not -path '*/\\\\.*' | head -100 | sort)",
+      "Bash(gh repo view pepperroni666/Nocturne --json defaultBranchRef,isEmpty 2>/dev/null || echo \"gh check failed\")",
+      "Bash(gh auth status 2>&1)",
+      "Bash(which git && git --version && which brew)",
+      "Bash(brew install gh 2>&1 | tail -5)",
+      "Bash(gh repo view pepperroni666/Nocturne --json defaultBranchRef,description,isEmpty 2>&1)",
+      "Bash(git init && git checkout -b main && git remote add origin git@github.com:pepperroni666/Nocturne.git)",
+      "Bash(git add .gitignore CLAUDE.md PitchDSP/ Nocturne/Nocturne.xcodeproj/ Nocturne/NocturneUITests.xctestplan \"Nocturne/Nocturne/Assets.xcassets\" \"Nocturne/Nocturne/Resources/\" && git status --short)",
+      "Bash(git rm --cached -f PitchDSP && git add PitchDSP/ Nocturne/Nocturne.xcodeproj/ Nocturne/NocturneUITests.xctestplan \"Nocturne/Nocturne/Assets.xcassets\" \"Nocturne/Nocturne/Resources/\" && git status --short)",
+      "Bash(git add Nocturne/Nocturne.xcodeproj/ Nocturne/NocturneUITests.xctestplan \"Nocturne/Nocturne/Assets.xcassets/\" \"Nocturne/Nocturne/Resources/\" && git status --short)",
+      "Bash(ls /Users/arinaruslanovna/nocturne/Nocturne/ && git add \"Nocturne/\" && git status --short | head -30)",
+      "Bash(git reset HEAD && git add .gitignore CLAUDE.md PitchDSP/ Nocturne/Nocturne.xcodeproj/ Nocturne/NocturneUITests.xctestplan \"Nocturne/Nocturne/Assets.xcassets/\" \"Nocturne/Nocturne/Resources/\" && git status --short)",
+      "Bash(git rm --cached -r . && git add .gitignore CLAUDE.md PitchDSP/ Nocturne/Nocturne.xcodeproj/ Nocturne/NocturneUITests.xctestplan \"Nocturne/Nocturne/Assets.xcassets/\" \"Nocturne/Nocturne/Resources/\" && git status --short)",
+      "Bash(git commit -m \"chore: project skeleton — Xcode project, assets, sounds, PitchDSP\" && git push -u origin main)",
+      "Bash(git checkout -b feature/core && git add Nocturne/Nocturne/Core/ Nocturne/Nocturne/Helpers/ && git status --short)",
+      "Bash(git commit -m \"feat\\(core\\): add TCA primitives — Effect, ReducerProtocol, Store, Clamped\" && git push -u origin feature/core)",
+      "Bash(git checkout -b feature/engine && git add Nocturne/Nocturne/Shared/Engine/ Nocturne/Nocturne/Services/ && git status --short)",
+      "Bash(git commit -m \"feat\\(engine\\): audio engine, pitch detector, tone player, services\" && git push -u origin feature/engine)",
+      "Bash(git checkout -b feature/domain && git add \\\\\n  Nocturne/Nocturne/Domain/Metronome/Feature/ \\\\\n  Nocturne/Nocturne/Domain/Metronome/Model/ \\\\\n  Nocturne/Nocturne/Domain/Tuner/Feature/ \\\\\n  Nocturne/Nocturne/Domain/Tuner/Model/ \\\\\n  Nocturne/Nocturne/Domain/Tuner/Data/ \\\\\n  Nocturne/Nocturne/Domain/Settings/Feature/ \\\\\n  Nocturne/Nocturne/Domain/Settings/Model/ && git status --short)",
+      "Bash(git commit -m \"feat\\(domain\\): metronome, tuner, settings — state, actions, reducers, effects, models\" && git push -u origin feature/domain)",
+      "Bash(git checkout -b feature/views && git add \\\\\n  Nocturne/Nocturne/Domain/Metronome/View/ \\\\\n  Nocturne/Nocturne/Domain/Tuner/View/ \\\\\n  Nocturne/Nocturne/Domain/Settings/View/ \\\\\n  Nocturne/Nocturne/Domain/Theory/ \\\\\n  Nocturne/Nocturne/Shared/View/ \\\\\n  Nocturne/Nocturne/App/ \\\\\n  Nocturne/AccessibilityIdentifiers/ && git status --short)",
+      "Bash(git commit -m \"feat\\(views\\): SwiftUI views for metronome, tuner, settings; app entry; accessibility IDs\" && git push -u origin feature/views)",
+      "Bash(git checkout -b feature/tests && git add Nocturne/NocturneTests/ Nocturne/NocturneUITests/ && git status --short)",
+      "Bash(git commit -m \"test: unit tests \\(reducers, store, DSP, database\\) and UI tests \\(page objects, flows\\)\" && git push -u origin feature/tests)",
+      "Bash(git checkout feature/engine)",
+      "Bash(git rm Nocturne/Nocturne/Services/AppLifecycleProtocol.swift)",
+      "Bash(git commit -m \"refactor\\(engine\\): remove AppLifecycleProtocol — replaced by scenePhase in MainTabView\" && git push)",
+      "Bash(git checkout feature/domain)",
+      "Bash(git diff --stat && git add Nocturne/Nocturne/Domain/Metronome/Feature/MetronomeEffects.swift Nocturne/Nocturne/Domain/Metronome/Feature/MetronomeAction.swift Nocturne/Nocturne/Domain/Metronome/Feature/MetronomeReducer.swift && git commit -m \"refactor\\(domain\\): remove lifecycle effects — scenePhase handles background stop in MainTabView\" && git push)",
+      "Bash(git checkout feature/views)",
+      "Bash(git diff --stat && git add Nocturne/Nocturne/App/AppCoordinator.swift Nocturne/Nocturne/Shared/View/MainTabView.swift && git commit -m \"refactor\\(views\\): replace lifecycle service with scenePhase in MainTabView\" && git push)",
+      "Bash(git add Nocturne/Nocturne/Shared/Engine/AudioSession.swift Nocturne/Nocturne/Shared/Engine/AVAudioMetronomeEngine.swift Nocturne/Nocturne/Shared/Engine/TonePlayerEngine.swift && git diff --cached --stat && git commit -m \"refactor\\(engine\\): extract AudioSession.activate\\(\\) — remove duplicated session setup from both engines\" && git push)",
+      "Bash(git add Nocturne/Nocturne/Shared/Engine/AudioSession.swift Nocturne/Nocturne/Shared/Engine/AVAudioMetronomeEngine.swift Nocturne/Nocturne/Shared/Engine/TonePlayerEngine.swift && git commit -m \"refactor\\(engine\\): namespace AudioSession as Audio.Session\" && git push)",
+      "Bash(mkdir -p /Users/arinaruslanovna/nocturne/Nocturne/Nocturne/Shared/Engine/Metronome /Users/arinaruslanovna/nocturne/Nocturne/Nocturne/Shared/Engine/Pitch /Users/arinaruslanovna/nocturne/Nocturne/Nocturne/Shared/Engine/Tone && git mv Nocturne/Nocturne/Shared/Engine/MetronomeEngineProtocol.swift Nocturne/Nocturne/Shared/Engine/Metronome/MetronomeEngine.swift && git mv Nocturne/Nocturne/Shared/Engine/AVAudioMetronomeEngine.swift Nocturne/Nocturne/Shared/Engine/Metronome/AVMetronomeEngine.swift && git mv Nocturne/Nocturne/Shared/Engine/PitchDetectorProtocol.swift Nocturne/Nocturne/Shared/Engine/Pitch/PitchDetector.swift && git mv Nocturne/Nocturne/Shared/Engine/AVAudioPitchDetector.swift Nocturne/Nocturne/Shared/Engine/Pitch/AVPitchDetector.swift && git mv Nocturne/Nocturne/Shared/Engine/TonePlayerProtocol.swift Nocturne/Nocturne/Shared/Engine/Tone/TonePlayer.swift && git mv Nocturne/Nocturne/Shared/Engine/TonePlayerEngine.swift Nocturne/Nocturne/Shared/Engine/Tone/TonePlayerEngine.swift && git status --short)",
+      "Bash(git add -A && git status --short && git commit -m \"refactor\\(engine\\): namespace actors under Audio, rename protocols, split into Metronome/Pitch/Tone subfolders\" && git push)"
+    ]
+  }
+}
