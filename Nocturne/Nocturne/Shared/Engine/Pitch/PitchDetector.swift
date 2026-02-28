@@ -13,7 +13,7 @@ extension Tuner {
     }
 }
 
-protocol PitchDetectorProtocol: Sendable {
+protocol PitchDetector: Sendable {
     func requestPermission() async -> Tuner.MicPermissionStatus
     func start() async throws -> AsyncStream<Tuner.PitchReading>
     func stop() async

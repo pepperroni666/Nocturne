@@ -7,7 +7,7 @@ extension Metronome {
     }
 }
 
-protocol MetronomeEngineProtocol: Sendable {
+protocol MetronomeEngine: Sendable {
     func start(bpm: Int, beatsPerMeasure: Int, accentPattern: [Bool], beatSound: Metronome.BeatSound) async throws -> AsyncStream<Metronome.Tick>
     func updateTempo(bpm: Int) async
     func updateAccentPattern(_ pattern: [Bool]) async
