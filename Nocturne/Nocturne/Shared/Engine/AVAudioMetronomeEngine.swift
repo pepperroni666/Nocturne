@@ -24,9 +24,7 @@ actor AVAudioMetronomeEngine: MetronomeEngineProtocol {
     func start(bpm: Int, beatsPerMeasure: Int, accentPattern: [Bool], beatSound: Metronome.BeatSound) async throws -> AsyncStream<Metronome.Tick> {
         stop()
 
-        let session = AVAudioSession.sharedInstance()
-        try session.setCategory(.playback, mode: .default, options: [.mixWithOthers])
-        try session.setActive(true)
+        try AudioSession.activate()
 
         let engine = AVAudioEngine()
         let format = engine.outputNode.outputFormat(forBus: 0)
