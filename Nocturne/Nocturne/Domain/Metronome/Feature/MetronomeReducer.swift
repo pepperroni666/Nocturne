@@ -141,9 +141,6 @@ extension Metronome {
                 state.currentBeat = 0
                 return dependencies.stopEngineEffect()
 
-            case .appBecameActive:
-                return .none
-
             case .persistRequested:
                 return dependencies.persist(bpm: state.bpm, timeSignature: state.timeSignature, beatSound: state.beatSound)
 
@@ -155,9 +152,6 @@ extension Metronome {
 
             case .loadSettings:
                 return dependencies.loadSettingsEffect()
-
-            case .observeLifecycle:
-                return dependencies.observeLifecycle()
 
             case .engineStartFailed:
                 state.isPlaying = false
