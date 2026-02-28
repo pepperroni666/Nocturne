@@ -10,20 +10,20 @@ final class AppCoordinator {
         metronomeDependencies: Metronome.Effects? = nil,
         tunerDependencies: Tuner.Effects? = nil
     ) {
+        let sharedSettings = Settings.Effects.live()
         let metronomeDeps = metronomeDependencies ?? Metronome.Effects.live(
             engine: Audio.AVMetronomeEngine(),
-            settings: UserDefaultsSettingsStore()
+            settings: sharedSettings
         )
 
         metronomeStore = Store(initial: Metronome.State()) { state, action in
             Metronome.Reducer.reduce(state: &state, action: action, dependencies: metronomeDeps)
         }
 
-        let settings = UserDefaultsSettingsStore()
         let tunerDeps = tunerDependencies ?? Tuner.Effects.live(
             pitchDetector: Audio.AVPitchDetector(),
             tonePlayer: Audio.TonePlayerEngine(),
-            settings: settings
+            settings: sharedSettings
         )
 
         tunerStore = Store(initial: Tuner.State()) { state, action in
