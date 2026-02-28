@@ -25,7 +25,7 @@ actor TonePlayerEngine: TonePlayerProtocol {
     func play(frequency: Double) async throws -> AsyncStream<Tuner.ToneEvent> {
         await stop()
 
-        try AudioSession.activate()
+        try Audio.Session.activate()
 
         let engine = AVAudioEngine()
         let format = engine.outputNode.outputFormat(forBus: 0)
