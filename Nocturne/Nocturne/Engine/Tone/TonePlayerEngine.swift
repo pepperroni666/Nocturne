@@ -3,17 +3,11 @@ import Foundation
 
 extension Audio {
     actor TonePlayerEngine: TonePlayer {
-        private let sampleLoader: any AudioSampleLoading
-
         private var audioEngine: AVAudioEngine?
         private var sourceNode: AVAudioSourceNode?
         private var continuation: AsyncStream<Tuner.ToneEvent>.Continuation?
 
         private let playbackState = SamplePlaybackState()
-
-        init(sampleLoader: any AudioSampleLoading = LoadAudioSampleUseCase()) {
-            self.sampleLoader = sampleLoader
-        }
 
         func play(frequency: Double) async throws -> AsyncStream<Tuner.ToneEvent> {
             await stop()
@@ -26,7 +20,7 @@ extension Audio {
 
             // TODO: load note-specific WAV keyed by frequency/MIDI once assets are ready.
             // For now, use a simple tick click as a placeholder for every note.
-            let samples = try sampleLoader.load(named: "simple_normal", targetSampleRate: sampleRate)
+            let samples = try Audio.SampleLoader.load(sound: .simple, accent: false, sampleRate: sampleRate)
 
             playbackState.samples = samples
             playbackState.position = 0

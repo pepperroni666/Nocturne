@@ -3,8 +3,6 @@ import Foundation
 
 extension Audio {
     actor AVMetronomeEngine: MetronomeEngine {
-        private let sampleLoader: any AudioSampleLoading
-
         private var audioEngine: AVAudioEngine?
         private var sourceNode: AVAudioSourceNode?
         private var continuation: AsyncStream<Metronome.Tick>.Continuation?
@@ -24,10 +22,6 @@ extension Audio {
 
         private let audioState = AudioState()
 
-        init(sampleLoader: any AudioSampleLoading = LoadAudioSampleUseCase()) {
-            self.sampleLoader = sampleLoader
-        }
-
         func start(bpm: Int, beatsPerMeasure: Int, accentPattern: [Bool], beatSound: Metronome.BeatSound) async throws -> AsyncStream<Metronome.Tick> {
             stop()
 
@@ -44,8 +38,8 @@ extension Audio {
             audioState.currentBeat = 0
             audioState.beatsPerMeasure = beatsPerMeasure
 
-            audioState.accentClick = try sampleLoader.load(named: beatSound.accentFileName, targetSampleRate: sampleRate)
-            audioState.normalClick = try sampleLoader.load(named: beatSound.normalFileName, targetSampleRate: sampleRate)
+            audioState.accentClick = try Audio.SampleLoader.load(sound: beatSound, accent: true, sampleRate: sampleRate)
+            audioState.normalClick = try Audio.SampleLoader.load(sound: beatSound, accent: false, sampleRate: sampleRate)
 
             audioState.accentPattern = accentPattern
             audioState.isRunning = true
@@ -118,12 +112,11 @@ extension Audio {
 
         func updateBeatSound(_ beatSound: Metronome.BeatSound) {
             let sampleRate = audioState.sampleRate
-            if let accent = try? sampleLoader.load(named: beatSound.accentFileName, targetSampleRate: sampleRate),
-               let normal = try? sampleLoader.load(named: beatSound.normalFileName, targetSampleRate: sampleRate) {
+            if let accent = try? Audio.SampleLoader.load(sound: beatSound, accent: true, sampleRate: sampleRate),
+               let normal = try? Audio.SampleLoader.load(sound: beatSound, accent: false, sampleRate: sampleRate) {
                 audioState.accentClick = accent
                 audioState.normalClick = normal
             }
-            // If WAV files are missing, keep existing samples until they are added.
         }
 
         func stop() {

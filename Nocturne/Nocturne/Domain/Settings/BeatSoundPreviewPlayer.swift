@@ -1,14 +1,9 @@
 import AVFoundation
 
 final class BeatSoundPreviewPlayer {
-    private let sampleLoader: any AudioSampleLoading
     private var engine: AVAudioEngine?
     private var sourceNode: AVAudioSourceNode?
     private var task: Task<Void, Never>?
-
-    init(sampleLoader: any AudioSampleLoading = LoadAudioSampleUseCase()) {
-        self.sampleLoader = sampleLoader
-    }
 
     func play(sound: Metronome.BeatSound) throws {
         stop()
@@ -17,8 +12,8 @@ final class BeatSoundPreviewPlayer {
         let format = audioEngine.outputNode.outputFormat(forBus: 0)
         let sampleRate = format.sampleRate
 
-        let accentSamples = try sampleLoader.load(named: sound.accentFileName, targetSampleRate: sampleRate)
-        let normalSamples = try sampleLoader.load(named: sound.normalFileName, targetSampleRate: sampleRate)
+        let accentSamples = try Audio.SampleLoader.load(sound: sound, accent: true, sampleRate: sampleRate)
+        let normalSamples = try Audio.SampleLoader.load(sound: sound, accent: false, sampleRate: sampleRate)
 
         // Build 4 beats at 120 BPM: accent, normal, normal, normal
         let samplesPerBeat = Int(sampleRate * 60.0 / 120.0)
