@@ -11,7 +11,7 @@ final class AppCoordinator {
         tunerDependencies: Tuner.Effects? = nil
     ) {
         let metronomeDeps = metronomeDependencies ?? Metronome.Effects.live(
-            engine: AVAudioMetronomeEngine(),
+            engine: Audio.AVMetronomeEngine(),
             settings: UserDefaultsSettingsStore()
         )
 
@@ -21,8 +21,8 @@ final class AppCoordinator {
 
         let settings = UserDefaultsSettingsStore()
         let tunerDeps = tunerDependencies ?? Tuner.Effects.live(
-            pitchDetector: AVAudioPitchDetector(),
-            tonePlayer: TonePlayerEngine(),
+            pitchDetector: Audio.AVPitchDetector(),
+            tonePlayer: Audio.TonePlayerEngine(),
             settings: settings
         )
 
