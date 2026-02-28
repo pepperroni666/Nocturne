@@ -118,7 +118,7 @@ extension Tuner.Effects {
     static func live(
         pitchDetector: Audio.AVPitchDetector,
         tonePlayer: Audio.TonePlayerEngine,
-        settings: UserDefaultsSettingsStore
+        settings: Settings.Effects
     ) -> Tuner.Effects {
         Tuner.Effects(
             requestMicPermission: { await pitchDetector.requestPermission() },
@@ -141,7 +141,7 @@ extension Tuner.Effects {
             playTone: { frequency in try await tonePlayer.play(frequency: frequency) },
             stopTone: { await tonePlayer.stop() },
             loadSettings: { settings.loadTuner() },
-            saveSettings: { settings.saveTuner(instrument: $0, tuning: $1, a4: $2) }
+            saveSettings: { settings.saveTuner($0, $1, $2) }
         )
     }
 }

@@ -88,7 +88,7 @@ extension Metronome.Effects {
 extension Metronome.Effects {
     static func live(
         engine: Audio.AVMetronomeEngine,
-        settings: UserDefaultsSettingsStore
+        settings: Settings.Effects
     ) -> Metronome.Effects {
         Metronome.Effects(
             startEngine: { bpm, beats, pattern, sound in
@@ -98,8 +98,8 @@ extension Metronome.Effects {
             updateTempo: { await engine.updateTempo(bpm: $0) },
             updateAccentPattern: { await engine.updateAccentPattern($0) },
             updateBeatSound: { await engine.updateBeatSound($0) },
-            loadSettings: { settings.load() },
-            saveSettings: { settings.save(bpm: $0, timeSignature: $1, beatSound: $2) }
+            loadSettings: { settings.loadMetronome() },
+            saveSettings: { settings.saveMetronome($0, $1, $2) }
         )
     }
 }
