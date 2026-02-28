@@ -3,25 +3,17 @@ import Foundation
 
 extension Audio {
     actor TonePlayerEngine: TonePlayer {
+        private let sampleLoader: any AudioSampleLoading
+
         private var audioEngine: AVAudioEngine?
         private var sourceNode: AVAudioSourceNode?
         private var continuation: AsyncStream<Tuner.ToneEvent>.Continuation?
 
-        private final class ToneState: @unchecked Sendable {
-            var frequency: Double = 440.0
-            var phase: Double = 0.0
-            var sampleRate: Double = 44100.0
-            var amplitude: Float = 0.0
-            var targetAmplitude: Float = 0.8
-            var isRunning: Bool = false
+        private let playbackState = SamplePlaybackState()
 
-            // Fade: 10ms ramp
-            var fadeIncrement: Float {
-                Float(1.0 / (sampleRate * 0.01))
-            }
+        init(sampleLoader: any AudioSampleLoading = LoadAudioSampleUseCase()) {
+            self.sampleLoader = sampleLoader
         }
-
-        private let toneState = ToneState()
 
         func play(frequency: Double) async throws -> AsyncStream<Tuner.ToneEvent> {
             await stop()
@@ -32,39 +24,29 @@ extension Audio {
             let format = engine.outputNode.outputFormat(forBus: 0)
             let sampleRate = format.sampleRate
 
-            toneState.frequency = frequency
-            toneState.phase = 0
-            toneState.sampleRate = sampleRate
-            toneState.amplitude = 0
-            toneState.targetAmplitude = 0.8
-            toneState.isRunning = true
+            // TODO: load note-specific WAV keyed by frequency/MIDI once assets are ready.
+            // For now, use a simple tick click as a placeholder for every note.
+            let samples = try sampleLoader.load(named: "simple_normal", targetSampleRate: sampleRate)
+
+            playbackState.samples = samples
+            playbackState.position = 0
+            playbackState.loop = true
+            playbackState.isRunning = true
 
             let (stream, streamContinuation) = AsyncStream.makeStream(of: Tuner.ToneEvent.self)
             self.continuation = streamContinuation
 
-            let state = toneState
+            let state = playbackState
             let sourceNode = AVAudioSourceNode(format: format) { _, _, frameCount, audioBufferList -> OSStatus in
                 let ablPointer = UnsafeMutableAudioBufferListPointer(audioBufferList)
                 let frames = Int(frameCount)
-                let phaseIncrement = 2.0 * Double.pi * state.frequency / state.sampleRate
-                let fadeInc = state.fadeIncrement
 
                 for frame in 0..<frames {
-                    // Fade in/out
-                    if state.isRunning {
-                        if state.amplitude < state.targetAmplitude {
-                            state.amplitude = min(state.amplitude + fadeInc, state.targetAmplitude)
-                        }
-                    } else {
-                        state.amplitude = max(state.amplitude - fadeInc, 0)
+                    var sample: Float = 0
+                    if state.isRunning && !state.samples.isEmpty {
+                        sample = state.samples[state.position % state.samples.count]
+                        state.position += 1
                     }
-
-                    let sample = Float(sin(state.phase)) * state.amplitude
-                    state.phase += phaseIncrement
-                    if state.phase >= 2.0 * Double.pi {
-                        state.phase -= 2.0 * Double.pi
-                    }
-
                     for buffer in ablPointer {
                         let buf = UnsafeMutableBufferPointer<Float>(buffer)
                         buf[frame] = sample
@@ -80,18 +62,20 @@ extension Audio {
             self.audioEngine = engine
             self.sourceNode = sourceNode
 
+            streamContinuation.yield(.started)
             return stream
         }
 
         func stop() {
-            toneState.isRunning = false
-            // Allow brief fade out before teardown
+            guard playbackState.isRunning else { return }
+            playbackState.isRunning = false
             audioEngine?.stop()
             if let node = sourceNode {
                 audioEngine?.detach(node)
             }
             audioEngine = nil
             sourceNode = nil
+            continuation?.yield(.stopped)
             continuation?.finish()
             continuation = nil
         }
