@@ -4,6 +4,7 @@ import SwiftUI
 struct MainTabView: View {
     let store: Store<Metronome.State, Metronome.Action>
     let tunerStore: Store<Tuner.State, Tuner.Action>
+    let settingsStore: Store<Settings.State, Settings.Action>
     @State private var selectedTab = 0
     @Environment(\.scenePhase) private var scenePhase
 
@@ -27,7 +28,7 @@ struct MainTabView: View {
                 }
                 .tag(2)
 
-            Settings.RootView(store: store)
+            Settings.RootView(store: settingsStore)
                 .tabItem {
                     Label("Settings", systemImage: "gearshape")
                 }

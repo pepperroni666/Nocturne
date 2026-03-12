@@ -6,7 +6,6 @@ extension Audio {
         private var audioEngine: AVAudioEngine?
         private var sourceNode: AVAudioSourceNode?
         private var toneContinuation: AsyncStream<Tuner.ToneEvent>.Continuation?
-        private var autoStopTask: Task<Void, Never>?
 
         private let playbackState = SamplePlaybackState()
 
@@ -37,7 +36,11 @@ extension Audio {
             return stream
         }
 
-        // MARK: - Beat preview (settings picker, plays 4 beats then stops)
+        // MARK: - Beat preview (settings picker)
+        //
+        // Suspends for the exact playback duration so the caller's Task (owned by the
+        // Settings store) can be cancelled when the user picks a different sound.
+        // On cancellation, defer { stop() } tears down the engine immediately.
 
         func playBeatPreview(sound: Metronome.BeatSound) async throws {
             stop()
@@ -60,6 +63,8 @@ extension Audio {
                 }
             }
 
+            let duration = Double(buffer.count) / sampleRate
+
             playbackState.samples = buffer
             playbackState.position = 0
             playbackState.loop = false
@@ -67,18 +72,14 @@ extension Audio {
 
             try startEngine(engine, format: format)
 
-            autoStopTask = Task { [weak self] in
-                try? await Task.sleep(for: .seconds(2.2))
-                await self?.stop()
-            }
+            defer { stop() }
+            try await Task.sleep(for: .seconds(duration))
         }
 
         // MARK: - Stop
 
         func stop() {
             guard playbackState.isRunning || audioEngine != nil else { return }
-            autoStopTask?.cancel()
-            autoStopTask = nil
             playbackState.isRunning = false
             audioEngine?.stop()
             if let node = sourceNode {

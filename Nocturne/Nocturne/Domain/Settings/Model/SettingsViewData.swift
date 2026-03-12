@@ -10,8 +10,8 @@ extension Settings {
     }
 }
 
-extension Metronome.State {
-    var settingsViewData: Settings.RootViewData {
+extension Settings.State {
+    var viewData: Settings.RootViewData {
         .init(
             navigationTitle: "Settings",
             metronomeSectionHeader: "Metronome",

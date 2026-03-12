@@ -3,9 +3,9 @@ import SwiftUI
 
 extension Settings {
     struct RootView: View {
-        let store: Store<Metronome.State, Metronome.Action>
+        let store: Store<Settings.State, Settings.Action>
 
-        private var viewData: Settings.RootViewData { store.state.settingsViewData }
+        private var viewData: Settings.RootViewData { store.state.viewData }
 
         var body: some View {
             NavigationStack {
@@ -15,11 +15,7 @@ extension Settings {
                     List {
                         Section {
                             NavigationLink {
-                                Settings.BeatSoundPicker(
-                                    navigationTitle: viewData.beatSoundNavigationTitle,
-                                    selected: store.state.beatSound,
-                                    onSelect: { store.send(.beatSoundChanged($0)) }
-                                )
+                                Settings.BeatSoundPicker(store: store)
                             } label: {
                                 HStack {
                                     Text(viewData.beatSoundLabel)
