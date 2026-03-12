@@ -102,7 +102,7 @@ extension Metronome.Effects {
                 let bpm = Int(settings.load("nocturne.bpm") ?? "") ?? 120
                 let beats = Int(settings.load("nocturne.ts.beats") ?? "") ?? 0
                 let noteValue = Int(settings.load("nocturne.ts.noteValue") ?? "") ?? 4
-                let beatSound = BeatSound(rawValue: settings.load("nocturne.beatSound") ?? "") ?? .simple
+                let beatSound = Metronome.BeatSound(rawValue: settings.load("nocturne.beatSound") ?? "") ?? .simple
                 return (
                     bpm: bpm > 0 ? bpm : 120,
                     timeSignature: beats > 0 ? .init(beats: beats, noteValue: noteValue) : .fourFour,
