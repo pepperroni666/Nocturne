@@ -28,7 +28,7 @@ extension Tuner {
         let midiNote: Int
     }
 
-    struct State: Sendable {
+    struct State: Sendable, Equatable {
         var mode: TunerMode = .microphone
         var micPermission: MicPermissionStatus = .notDetermined
         var isListening: Bool = false
@@ -48,5 +48,3 @@ extension Tuner {
         }
     }
 }
-
-extension Tuner.State: Equatable {}

@@ -27,8 +27,8 @@ final class AppCoordinator {
             overrides: settingsDependencies,
             storage: sharedStorage,
             soundPlayer: sharedSoundPlayer,
-            onSoundChanged: { @MainActor [weak metronomeStore] sound in
-                metronomeStore?.send(.beatSoundChanged(sound))
+            onSoundChanged: { sound in
+                metronomeStore.send(.beatSoundChanged(sound))
             }
         )
 

@@ -3,7 +3,6 @@ import Foundation
 enum Settings {}
 
 extension Settings {
-    @MainActor
     static func makeStore(
         overrides: Settings.Effects? = nil,
         storage: Settings.Storage,

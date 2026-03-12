@@ -3,7 +3,6 @@ import Foundation
 enum Tuner {}
 
 extension Tuner {
-    @MainActor
     static func makeStore(
         overrides: Tuner.Effects? = nil,
         storage: Settings.Storage,

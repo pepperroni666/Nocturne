@@ -3,7 +3,6 @@ import Foundation
 enum Metronome {}
 
 extension Metronome {
-    @MainActor
     static func makeStore(
         overrides: Metronome.Effects? = nil,
         storage: Settings.Storage
