@@ -17,28 +17,24 @@ final class AppCoordinator {
         let sharedStorage = Settings.Storage.live()
         let sharedSoundPlayer = Audio.SoundPlayerEngine()
 
-        self.metronomeStore = Self.makeMetronomeStore(
-            deps: metronomeDependencies,
-            storage: sharedStorage
-        )
-        self.tunerStore = Self.makeTunerStore(
-            deps: tunerDependencies,
-            storage: sharedStorage,
-            soundPlayer: sharedSoundPlayer
-        )
+        let metronomeStore = Self.makeMetronomeStore(overrides: metronomeDependencies, storage: sharedStorage)
+        let tunerStore = Self.makeTunerStore(overrides: tunerDependencies, storage: sharedStorage, soundPlayer: sharedSoundPlayer)
 
-        // Placeholder completes two-phase init so [weak self] is available below.
-        self.settingsStore = Store(initial: Settings.State()) { _, _ in .none }
-
-        // Settings routes beat-sound changes through the coordinator to the metronome.
-        self.settingsStore = Self.makeSettingsStore(
-            deps: settingsDependencies,
+        // Routes beat-sound changes through the coordinator to the metronome.
+        // [weak metronomeStore] is equivalent to [weak self].metronomeStore —
+        // self is not yet available because stored properties are assigned below.
+        let settingsStore = Self.makeSettingsStore(
+            overrides: settingsDependencies,
             storage: sharedStorage,
             soundPlayer: sharedSoundPlayer,
-            onSoundChanged: { [weak self] sound in
-                await MainActor.run { self?.onBeatSoundChanged(sound) }
+            onSoundChanged: { @MainActor [weak metronomeStore] sound in
+                metronomeStore?.send(.beatSoundChanged(sound))
             }
         )
+
+        self.metronomeStore = metronomeStore
+        self.tunerStore = tunerStore
+        self.settingsStore = settingsStore
     }
 
     func start() {
@@ -48,12 +44,4 @@ final class AppCoordinator {
         tunerStore.send(.loadSettings)
         settingsStore.send(.loadSettings)
     }
-
-    // MARK: - Routing
-
-    private func onBeatSoundChanged(_ sound: Metronome.BeatSound) {
-        metronomeStore.send(.beatSoundChanged(sound))
-    }
-
-
 }
