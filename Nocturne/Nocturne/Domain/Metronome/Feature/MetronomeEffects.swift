@@ -13,9 +13,9 @@ extension Metronome {
         var loadSettings: @Sendable () -> (bpm: Int, timeSignature: TimeSignature, beatSound: BeatSound)
         var saveSettings: @Sendable (Int, TimeSignature, BeatSound) -> Void
 
-        // Stream IDs
-        static let tickStreamID = UUID()
-        static let persistDebounceID = UUID()
+        // Effect IDs
+        static let tickStreamID = EffectID("metronome.tick")
+        static let persistDebounceID = EffectID("metronome.persist")
     }
 }
 

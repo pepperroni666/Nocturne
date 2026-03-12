@@ -2,19 +2,29 @@ import Foundation
 
 enum Effect<Action: Sendable>: Sendable {
     case none
-    case task(id: UUID = UUID(), operation: @Sendable () async -> Action?)
-    case stream(id: UUID = UUID(), operation: @Sendable (@escaping @MainActor (Action) -> Void) async -> Void)
+    case task(id: EffectID? = nil, operation: @Sendable () async -> Action?)
+    case stream(id: EffectID? = nil, operation: @Sendable (@escaping @MainActor @Sendable (Action) -> Void) async -> Void)
     case merge([Effect<Action>])
-    case cancel(UUID)
+    case cancel(EffectID)
 
-    static func run(id: UUID = UUID(), _ operation: @escaping @Sendable () async -> Action?) -> Effect {
+    static func run(
+        id: EffectID? = nil,
+        _ operation: @escaping @Sendable () async -> Action?
+    ) -> Effect {
         .task(id: id, operation: operation)
     }
 
-    static func fireAndForget(id: UUID = UUID(), _ operation: @escaping @Sendable () async -> Void) -> Effect {
-        .task(id: id, operation: {
+    static func fireAndForget(
+        id: EffectID? = nil,
+        _ operation: @escaping @Sendable () async -> Void
+    ) -> Effect {
+        .task(id: id) {
             await operation()
             return nil
-        })
+        }
+    }
+
+    static func merge(_ effects: Effect...) -> Effect {
+        .merge(effects)
     }
 }

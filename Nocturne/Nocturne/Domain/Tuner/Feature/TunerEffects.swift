@@ -15,10 +15,10 @@ extension Tuner {
         var loadSettings: @Sendable () -> (instrument: Instrument, tuning: TuningPreset, a4: Double)
         var saveSettings: @Sendable (Instrument, TuningPreset, Double) -> Void
 
-        // Stream IDs
-        static let pitchStreamID = UUID()
-        static let toneStreamID = UUID()
-        static let persistDebounceID = UUID()
+        // Effect IDs
+        static let pitchStreamID = EffectID("tuner.pitch")
+        static let toneStreamID = EffectID("tuner.tone")
+        static let persistDebounceID = EffectID("tuner.persist")
     }
 }
 

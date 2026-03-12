@@ -6,7 +6,7 @@ import Observation
 final class Store<State: Sendable, Action: Sendable> {
     private(set) var state: State
     private let reducer: @MainActor (inout State, Action) -> Effect<Action>
-    private var effectTasks: [UUID: Task<Void, Never>] = [:]
+    private var tasks: [EffectID: Task<Void, Never>] = [:]
 
     init(initial: State, reducer: @escaping @MainActor (inout State, Action) -> Effect<Action>) {
         self.state = initial
@@ -30,6 +30,7 @@ final class Store<State: Sendable, Action: Sendable> {
 
     private func execute(_ effect: Effect<Action>) {
         switch effect {
+
         case .none:
             break
 
@@ -38,26 +39,28 @@ final class Store<State: Sendable, Action: Sendable> {
                 guard let action = await operation() else { return }
                 self?.send(action)
             }
-            effectTasks[id]?.cancel()
-            effectTasks[id] = task
+            if let id {
+                tasks[id]?.cancel()
+                tasks[id] = task
+            }
 
         case let .stream(id, operation):
             let task = Task { [weak self] in
-                await operation { action in
+                await operation { [weak self] action in
                     self?.send(action)
                 }
             }
-            effectTasks[id]?.cancel()
-            effectTasks[id] = task
-
-        case let .merge(effects):
-            for effect in effects {
-                execute(effect)
+            if let id {
+                tasks[id]?.cancel()
+                tasks[id] = task
             }
 
+        case let .merge(effects):
+            effects.forEach { execute($0) }
+
         case let .cancel(id):
-            effectTasks[id]?.cancel()
-            effectTasks.removeValue(forKey: id)
+            tasks[id]?.cancel()
+            tasks.removeValue(forKey: id)
         }
     }
 }

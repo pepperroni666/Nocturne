@@ -6,7 +6,7 @@ extension Settings {
         typealias Action = Settings.Action
         typealias Dependencies = Settings.Effects
 
-        private static let previewEffectID = UUID()
+        private static let previewEffectID = EffectID("settings.preview")
 
         static func reduce(state: inout State, action: Action, dependencies: Effects) -> Effect<Action> {
             switch action {
