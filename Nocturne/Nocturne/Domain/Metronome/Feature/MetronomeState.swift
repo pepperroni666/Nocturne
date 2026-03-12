@@ -1,7 +1,7 @@
 import Foundation
 
 extension Metronome {
-    struct State: Sendable, Equatable {
+    struct State: Sendable {
         var bpm: Int = 120
         var timeSignature: TimeSignature = .fourFour
         var isPlaying: Bool = false
@@ -32,3 +32,5 @@ extension Metronome {
         }
     }
 }
+
+extension Metronome.State: Equatable {}
