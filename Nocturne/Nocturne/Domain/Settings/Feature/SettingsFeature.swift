@@ -8,7 +8,7 @@ extension Settings {
         overrides: Settings.Effects? = nil,
         storage: Settings.Storage,
         soundPlayer: Audio.SoundPlayerEngine,
-        onSoundChanged: @escaping @Sendable (Metronome.BeatSound) -> Void
+        onSoundChanged: @escaping @MainActor @Sendable (Metronome.BeatSound) -> Void
     ) -> Store<Settings.State, Settings.Action> {
         let dependencies = overrides ?? Settings.Effects.live(
             storage: storage,
