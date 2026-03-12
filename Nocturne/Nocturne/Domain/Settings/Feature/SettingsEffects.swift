@@ -7,7 +7,7 @@ extension Settings {
         var playPreview: @Sendable (Metronome.BeatSound) async throws -> Void
         /// Called after the user confirms a sound selection so other features can react.
         /// Always invoked on the MainActor (Store effects inherit MainActor isolation).
-        var onSoundChanged: @Sendable (Metronome.BeatSound) async -> Void
+        var onSoundChanged: @Sendable (Metronome.BeatSound) -> Void
     }
 }
 
@@ -17,7 +17,7 @@ extension Settings.Effects {
     static func live(
         storage: Settings.Storage = .live(),
         soundPlayer: Audio.SoundPlayerEngine,
-        onSoundChanged: @escaping @Sendable (Metronome.BeatSound) async -> Void
+        onSoundChanged: @escaping @Sendable (Metronome.BeatSound) -> Void
     ) -> Settings.Effects {
         Settings.Effects(
             loadBeatSound: {
@@ -39,7 +39,7 @@ extension Settings.Effects {
 #if DEBUG
 extension Settings.Effects {
     static func mock(
-        onSoundChanged: @escaping @Sendable (Metronome.BeatSound) async -> Void = { _ in }
+        onSoundChanged: @escaping @Sendable (Metronome.BeatSound) -> Void = { _ in }
     ) -> Settings.Effects {
         Settings.Effects(
             loadBeatSound: { .simple },

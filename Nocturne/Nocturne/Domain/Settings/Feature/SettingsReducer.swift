@@ -18,7 +18,7 @@ extension Settings {
                 let save = dependencies.saveBeatSound
                 let play = dependencies.playPreview
                 return .merge([
-                    .fireAndForget { await notify(sound); save(sound) },
+                    .fireAndForget { notify(sound); save(sound) },
                     .run(id: previewEffectID) {
                         try? await play(sound)
                         return Task.isCancelled ? nil : .previewFinished
