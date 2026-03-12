@@ -3,7 +3,7 @@ import Observation
 
 @MainActor
 @Observable
-final class Store<State: Equatable, Action: Sendable> {
+final class Store<State: Sendable, Action: Sendable> {
     private(set) var state: State
     private let reducer: @MainActor (inout State, Action) -> Effect<Action>
     private var effectTasks: [UUID: Task<Void, Never>] = [:]
