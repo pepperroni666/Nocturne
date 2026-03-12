@@ -117,8 +117,8 @@ extension Tuner.Effects {
 
     static func live(
         pitchDetector: Audio.AVPitchDetector,
-        tonePlayer: Audio.TonePlayerEngine,
-        settings: Settings.Effects
+        tonePlayer: any TonePlayer,
+        settings: Settings.Storage
     ) -> Tuner.Effects {
         Tuner.Effects(
             requestMicPermission: { await pitchDetector.requestPermission() },

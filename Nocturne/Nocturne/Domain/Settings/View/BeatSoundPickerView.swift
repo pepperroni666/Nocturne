@@ -3,11 +3,7 @@ import SwiftUI
 
 extension Settings {
     struct BeatSoundPicker: View {
-        let navigationTitle: String
-        let selected: Metronome.BeatSound
-        let onSelect: (Metronome.BeatSound) -> Void
-
-        @SwiftUI.State private var previewPlayer: BeatSoundPreviewPlayer?
+        let store: Store<Settings.State, Settings.Action>
 
         var body: some View {
             ZStack {
@@ -16,14 +12,13 @@ extension Settings {
                 List {
                     ForEach(Metronome.BeatSound.allCases, id: \.self) { sound in
                         Button {
-                            onSelect(sound)
-                            playPreview(sound)
+                            store.send(.soundSelected(sound))
                         } label: {
                             HStack {
                                 Text(sound.displayName)
                                     .foregroundStyle(NocturneTheme.textPrimary)
                                 Spacer()
-                                if sound == selected {
+                                if sound == store.state.beatSound {
                                     Image(systemName: "checkmark")
                                         .foregroundStyle(NocturneTheme.accentViolet)
                                         .fontWeight(.semibold)
@@ -31,23 +26,13 @@ extension Settings {
                             }
                         }
                         .accessibilityIdentifier(AccessibilityIds.Settings.beatSoundOption(sound.rawValue))
-                        .accessibilityAddTraits(sound == selected ? .isSelected : [])
+                        .accessibilityAddTraits(sound == store.state.beatSound ? .isSelected : [])
                     }
                 }
                 .scrollContentBackground(.hidden)
             }
-            .navigationTitle(navigationTitle)
+            .navigationTitle("Beat Sound")
             .navigationBarTitleDisplayMode(.inline)
-            .onDisappear {
-                previewPlayer?.stop()
-            }
-        }
-
-        private func playPreview(_ sound: Metronome.BeatSound) {
-            previewPlayer?.stop()
-            let player = BeatSoundPreviewPlayer()
-            previewPlayer = player
-            player.play(sound: sound)
         }
     }
 }

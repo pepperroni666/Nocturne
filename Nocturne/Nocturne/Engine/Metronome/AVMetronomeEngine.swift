@@ -38,8 +38,8 @@ extension Audio {
             audioState.currentBeat = 0
             audioState.beatsPerMeasure = beatsPerMeasure
 
-            audioState.accentClick = Audio.SampleLoader.load(sound: beatSound, accent: true, sampleRate: sampleRate)
-            audioState.normalClick = Audio.SampleLoader.load(sound: beatSound, accent: false, sampleRate: sampleRate)
+            audioState.accentClick = try Audio.SampleLoader.load(sound: beatSound, accent: true, sampleRate: sampleRate)
+            audioState.normalClick = try Audio.SampleLoader.load(sound: beatSound, accent: false, sampleRate: sampleRate)
 
             audioState.accentPattern = accentPattern
             audioState.isRunning = true
@@ -60,7 +60,6 @@ extension Audio {
 
                 let frames = Int(frameCount)
                 for frame in 0..<frames {
-                    // Advance beat based on timing, not click length
                     if state.currentSampleIndex >= state.nextBeatSample {
                         let isAccent = state.accentPattern.indices.contains(state.currentBeat) ? state.accentPattern[state.currentBeat] : state.currentBeat == 0
                         let tick = Metronome.Tick(beat: state.currentBeat, isAccent: isAccent)
@@ -70,12 +69,10 @@ extension Audio {
                         state.nextBeatSample += Int64(state.samplesPerBeat)
                     }
 
-                    // Determine which beat we're in and how far into it
                     let beatSamples = Int64(state.samplesPerBeat)
                     let prevBeatStart = state.nextBeatSample - beatSamples
                     let offsetInBeat = Int(state.currentSampleIndex - prevBeatStart)
 
-                    // Pick the click for the beat that just started
                     let playingBeat = (state.currentBeat - 1 + state.beatsPerMeasure) % state.beatsPerMeasure
                     let isAccent = state.accentPattern.indices.contains(playingBeat) ? state.accentPattern[playingBeat] : playingBeat == 0
                     let clickSamples = isAccent ? state.accentClick : state.normalClick
@@ -114,8 +111,12 @@ extension Audio {
         }
 
         func updateBeatSound(_ beatSound: Metronome.BeatSound) {
-            audioState.accentClick = Audio.SampleLoader.load(sound: beatSound, accent: true, sampleRate: audioState.sampleRate)
-            audioState.normalClick = Audio.SampleLoader.load(sound: beatSound, accent: false, sampleRate: audioState.sampleRate)
+            let sampleRate = audioState.sampleRate
+            if let accent = try? Audio.SampleLoader.load(sound: beatSound, accent: true, sampleRate: sampleRate),
+               let normal = try? Audio.SampleLoader.load(sound: beatSound, accent: false, sampleRate: sampleRate) {
+                audioState.accentClick = accent
+                audioState.normalClick = normal
+            }
         }
 
         func stop() {

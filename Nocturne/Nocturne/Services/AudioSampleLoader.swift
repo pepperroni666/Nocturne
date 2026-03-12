@@ -1,31 +1,46 @@
 import AVFoundation
 
+enum AudioSampleError: Error, CustomStringConvertible {
+    case fileNotFound(String)
+    case readFailed(String)
+
+    var description: String {
+        switch self {
+        case let .fileNotFound(name): return "WAV file not found in bundle: \(name).wav"
+        case let .readFailed(name): return "Failed to read WAV file: \(name).wav"
+        }
+    }
+}
+
 extension Audio {
     enum SampleLoader {
-        static func load(sound: Metronome.BeatSound, accent: Bool, sampleRate: Double) -> [Float] {
+        static func load(sound: Metronome.BeatSound, accent: Bool, sampleRate: Double) throws -> [Float] {
             let name = accent ? sound.accentFileName : sound.normalFileName
-            if let samples = loadWAV(named: name, targetSampleRate: sampleRate) {
-                return samples
-            }
-            return generateClick(
-                frequency: accent ? 1200 : 880,
-                amplitude: accent ? 0.8 : 0.5,
-                durationMs: 5,
-                sampleRate: Float(sampleRate)
-            )
+            return try loadWAV(named: name, targetSampleRate: sampleRate)
         }
 
-        static func loadWAV(named name: String, targetSampleRate: Double) -> [Float]? {
-            guard let url = Bundle.main.url(forResource: name, withExtension: "wav"),
-                  let file = try? AVAudioFile(forReading: url) else { return nil }
+        static func loadWAV(named name: String, targetSampleRate: Double) throws -> [Float] {
+            guard let url = Bundle.main.url(forResource: name, withExtension: "wav") else {
+                throw AudioSampleError.fileNotFound(name)
+            }
+
+            let file: AVAudioFile
+            do {
+                file = try AVAudioFile(forReading: url)
+            } catch {
+                throw AudioSampleError.readFailed(name)
+            }
 
             let format = file.processingFormat
             let frameCount = AVAudioFrameCount(file.length)
             guard frameCount > 0,
                   let buffer = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: frameCount),
                   (try? file.read(into: buffer)) != nil,
-                  let channelData = buffer.floatChannelData else { return nil }
+                  let channelData = buffer.floatChannelData else {
+                throw AudioSampleError.readFailed(name)
+            }
 
+            // Mix to mono
             let channels = Int(format.channelCount)
             let frames = Int(buffer.frameLength)
             var mono = [Float](repeating: 0, count: frames)
@@ -39,6 +54,7 @@ extension Audio {
                 }
             }
 
+            // Resample via linear interpolation if sample rates differ
             let sourceSampleRate = format.sampleRate
             guard abs(sourceSampleRate - targetSampleRate) >= 1.0 else { return mono }
 
@@ -53,20 +69,6 @@ extension Audio {
                 resampled[i] = mono[low] * (1 - frac) + mono[high] * frac
             }
             return resampled
-        }
-
-        static func generateClick(
-            frequency: Float,
-            amplitude: Float,
-            durationMs: Float,
-            sampleRate: Float
-        ) -> [Float] {
-            let sampleCount = Int(sampleRate * durationMs / 1000.0)
-            return (0..<sampleCount).map { i in
-                let t = Float(i) / sampleRate
-                let envelope = exp(-t * 800)
-                return amplitude * sin(2.0 * .pi * frequency * t) * envelope
-            }
         }
     }
 }

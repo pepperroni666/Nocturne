@@ -88,7 +88,7 @@ extension Metronome.Effects {
 extension Metronome.Effects {
     static func live(
         engine: Audio.AVMetronomeEngine,
-        settings: Settings.Effects
+        settings: Settings.Storage
     ) -> Metronome.Effects {
         Metronome.Effects(
             startEngine: { bpm, beats, pattern, sound in
