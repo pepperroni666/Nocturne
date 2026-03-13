@@ -15,8 +15,12 @@ struct NocturneApp: App {
 
     var body: some Scene {
         WindowGroup {
-            MainTabView(store: coordinator.metronomeStore, tunerStore: coordinator.tunerStore, settingsStore: coordinator.settingsStore)
-                .onAppear { coordinator.start() }
+            MainTabView(
+                store: coordinator.metronomeStore,
+                tunerStore: coordinator.tunerStore,
+                settingsStore: coordinator.settingsStore
+            )
+            .task { coordinator.start() }
         }
     }
 }

@@ -1,6 +1,12 @@
 import Foundation
 import Observation
 
+// Reference box that lets a Task's closure body compare itself against the
+// tasks dictionary without a forward reference to the task variable itself.
+private final class TaskRef: @unchecked Sendable {
+    var value: Task<Void, Never>?
+}
+
 @MainActor
 @Observable
 final class Store<State: Sendable, Action: Sendable> {
@@ -28,6 +34,35 @@ final class Store<State: Sendable, Action: Sendable> {
         execute(effect)
     }
 
+    /// Cancels all in-flight named effects. Anonymous effects (id: nil) are
+    /// fire-and-forget and are not tracked here.
+    func cancelAll() {
+        for task in tasks.values { task.cancel() }
+        tasks.removeAll()
+    }
+
+    // MARK: - Private
+
+    private func cancelTask(id: EffectID) {
+        tasks[id]?.cancel()
+        tasks.removeValue(forKey: id)
+    }
+
+    private func register(id: EffectID?, _ task: Task<Void, Never>) {
+        guard let id else { return }
+        cancelTask(id: id)
+        tasks[id] = task
+    }
+
+    /// Creates, registers, and starts a task. The body receives a `TaskRef`
+    /// pre-wired to the task, enabling identity-safe cleanup.
+    private func makeTask(id: EffectID?, _ body: @escaping @MainActor (TaskRef) async -> Void) {
+        let ref = TaskRef()
+        let task = Task { [ref] in await body(ref) }
+        ref.value = task
+        register(id: id, task)
+    }
+
     private func execute(_ effect: Effect<Action>) {
         switch effect {
 
@@ -35,32 +70,37 @@ final class Store<State: Sendable, Action: Sendable> {
             break
 
         case let .task(id, operation):
-            let task = Task { [weak self] in
-                guard let action = await operation() else { return }
-                self?.send(action)
-            }
-            if let id {
-                tasks[id]?.cancel()
-                tasks[id] = task
+            makeTask(id: id) { [weak self] ref in
+                guard !Task.isCancelled else { return }
+                let action = await operation()
+                guard !Task.isCancelled, let action else { return }
+                guard let self else { return }
+                self.send(action)
+                if let id, self.tasks[id] == ref.value {
+                    self.tasks.removeValue(forKey: id)
+                }
             }
 
         case let .stream(id, operation):
-            let task = Task { [weak self] in
-                await operation { [weak self] action in
-                    self?.send(action)
+            makeTask(id: id) { [weak self] ref in
+                // send is awaited here because operations may emit from a
+                // non-@MainActor context (e.g. an audio engine actor).
+                await operation { [weak self] (action: Action) in
+                    guard !Task.isCancelled else { return }
+                    guard let self else { return }
+                    await self.send(action)
                 }
-            }
-            if let id {
-                tasks[id]?.cancel()
-                tasks[id] = task
+                guard !Task.isCancelled, let self, let id else { return }
+                if self.tasks[id] == ref.value {
+                    self.tasks.removeValue(forKey: id)
+                }
             }
 
         case let .merge(effects):
-            effects.forEach { execute($0) }
+            for effect in effects { execute(effect) }
 
         case let .cancel(id):
-            tasks[id]?.cancel()
-            tasks.removeValue(forKey: id)
+            cancelTask(id: id)
         }
     }
 }
