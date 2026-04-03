@@ -36,3 +36,6 @@ fastlane/test_output
 
 # Claude Code
 .claude/
+
+# PitchDSP is a separate git repo / SPM package
+PitchDSP/

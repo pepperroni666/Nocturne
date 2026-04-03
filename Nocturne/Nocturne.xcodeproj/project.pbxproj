@@ -81,7 +81,6 @@
 		407C6E4F2F420632000990CC /* Nocturne.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Nocturne.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		407C6E5E2F420633000990CC /* NocturneTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NocturneTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		407C6E682F420633000990CC /* NocturneUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NocturneUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		40F92A722F521992003163A0 /* PitchDSP */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = PitchDSP; path = ../PitchDSP; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -154,7 +153,6 @@
 		407C6E462F420632000990CC = {
 			isa = PBXGroup;
 			children = (
-				40F92A722F521992003163A0 /* PitchDSP */,
 				403AF5782F435C75006BA66D /* NocturneUITests.xctestplan */,
 				407C6E512F420632000990CC /* Nocturne */,
 				407C6E612F420633000990CC /* NocturneTests */,
@@ -346,7 +344,7 @@
 			mainGroup = 407C6E462F420632000990CC;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				40F92A732F5219E3003163A0 /* XCLocalSwiftPackageReference "../PitchDSP" */,
+				40F92A732F5219E3003163A0 /* XCRemoteSwiftPackageReference "https://github.com/peppperrroni/PitchDSP" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 407C6E502F420632000990CC /* Products */;
@@ -967,20 +965,26 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCLocalSwiftPackageReference section */
-		40F92A732F5219E3003163A0 /* XCLocalSwiftPackageReference "../PitchDSP" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = ../PitchDSP;
+/* Begin XCRemoteSwiftPackageReference section */
+		40F92A732F5219E3003163A0 /* XCRemoteSwiftPackageReference "https://github.com/peppperrroni/PitchDSP" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/peppperrroni/PitchDSP";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
 		};
-/* End XCLocalSwiftPackageReference section */
+/* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
 		40F92A742F5219E3003163A0 /* PitchDSP */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = 40F92A732F5219E3003163A0 /* XCRemoteSwiftPackageReference "https://github.com/peppperrroni/PitchDSP" */;
 			productName = PitchDSP;
 		};
 		40F92A762F521A00003163A0 /* PitchDSP */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = 40F92A732F5219E3003163A0 /* XCRemoteSwiftPackageReference "https://github.com/peppperrroni/PitchDSP" */;
 			productName = PitchDSP;
 		};
 /* End XCSwiftPackageProductDependency section */
