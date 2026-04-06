@@ -344,7 +344,7 @@
 			mainGroup = 407C6E462F420632000990CC;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				40F92A732F5219E3003163A0 /* XCRemoteSwiftPackageReference "https://github.com/peppperrroni/PitchDSP" */,
+				40F92A732F5219E3003163A0 /* XCRemoteSwiftPackageReference "PitchDSP" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 407C6E502F420632000990CC /* Products */;
@@ -966,7 +966,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		40F92A732F5219E3003163A0 /* XCRemoteSwiftPackageReference "https://github.com/peppperrroni/PitchDSP" */ = {
+		40F92A732F5219E3003163A0 /* XCRemoteSwiftPackageReference "PitchDSP" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/peppperrroni/PitchDSP";
 			requirement = {
@@ -979,12 +979,12 @@
 /* Begin XCSwiftPackageProductDependency section */
 		40F92A742F5219E3003163A0 /* PitchDSP */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 40F92A732F5219E3003163A0 /* XCRemoteSwiftPackageReference "https://github.com/peppperrroni/PitchDSP" */;
+			package = 40F92A732F5219E3003163A0 /* XCRemoteSwiftPackageReference "PitchDSP" */;
 			productName = PitchDSP;
 		};
 		40F92A762F521A00003163A0 /* PitchDSP */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 40F92A732F5219E3003163A0 /* XCRemoteSwiftPackageReference "https://github.com/peppperrroni/PitchDSP" */;
+			package = 40F92A732F5219E3003163A0 /* XCRemoteSwiftPackageReference "PitchDSP" */;
 			productName = PitchDSP;
 		};
 /* End XCSwiftPackageProductDependency section */

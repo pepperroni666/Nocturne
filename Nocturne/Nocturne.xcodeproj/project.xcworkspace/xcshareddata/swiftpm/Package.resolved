@@ -1,0 +1,15 @@
+{
+  "originHash" : "525def09c548552ced5390b570cf866e3394f71c37f743bc1b6021873024619c",
+  "pins" : [
+    {
+      "identity" : "pitchdsp",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/peppperrroni/PitchDSP",
+      "state" : {
+        "revision" : "2851d06162f40e981e4c399aac999be02afd6eb5",
+        "version" : "1.0.0"
+      }
+    }
+  ],
+  "version" : 3
+}

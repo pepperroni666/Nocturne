@@ -14,11 +14,12 @@ extension Audio {
         func play(frequency: Double) async throws -> AsyncStream<Tuner.ToneEvent> {
             stop()
 
-            try Audio.Session.activate()
+            try await Audio.Session.activate()
 
             let engine = AVAudioEngine()
-            let format = engine.outputNode.outputFormat(forBus: 0)
-            let sampleRate = format.sampleRate
+            let hardwareRate = engine.outputNode.outputFormat(forBus: 0).sampleRate
+            let sampleRate = hardwareRate > 0 ? hardwareRate : 44100.0
+            let format = AVAudioFormat(standardFormatWithSampleRate: sampleRate, channels: 2)!
 
             // TODO: load note-specific WAV keyed by frequency/MIDI once assets are ready.
             let samples = try Audio.SampleLoader.load(sound: .simple, accent: false, sampleRate: sampleRate)
@@ -45,11 +46,12 @@ extension Audio {
         func playBeatPreview(sound: Metronome.BeatSound) async throws {
             stop()
 
-            try Audio.Session.activate()
+            try await Audio.Session.activate()
 
             let engine = AVAudioEngine()
-            let format = engine.outputNode.outputFormat(forBus: 0)
-            let sampleRate = format.sampleRate
+            let hardwareRate = engine.outputNode.outputFormat(forBus: 0).sampleRate
+            let sampleRate = hardwareRate > 0 ? hardwareRate : 44100.0
+            let format = AVAudioFormat(standardFormatWithSampleRate: sampleRate, channels: 2)!
 
             let accentSamples = try Audio.SampleLoader.load(sound: sound, accent: true, sampleRate: sampleRate)
             let normalSamples = try Audio.SampleLoader.load(sound: sound, accent: false, sampleRate: sampleRate)

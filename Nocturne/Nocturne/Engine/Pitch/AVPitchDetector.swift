@@ -61,7 +61,7 @@ extension Audio {
         // MARK: - Start / Stop
 
         func start() async throws -> AsyncStream<Tuner.PitchReading> {
-            await stop()
+            stop()
 
             let session = AVAudioSession.sharedInstance()
             try session.setCategory(.record, mode: .measurement, options: [])

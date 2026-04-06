@@ -14,12 +14,12 @@ enum AudioSampleError: Error, CustomStringConvertible {
 
 extension Audio {
     enum SampleLoader {
-        static func load(sound: Metronome.BeatSound, accent: Bool, sampleRate: Double) throws -> [Float] {
+        static nonisolated func load(sound: Metronome.BeatSound, accent: Bool, sampleRate: Double) throws -> [Float] {
             let name = accent ? sound.accentFileName : sound.normalFileName
             return try loadWAV(named: name, targetSampleRate: sampleRate)
         }
 
-        static func loadWAV(named name: String, targetSampleRate: Double) throws -> [Float] {
+        static nonisolated func loadWAV(named name: String, targetSampleRate: Double) throws -> [Float] {
             guard let url = Bundle.main.url(forResource: name, withExtension: "wav") else {
                 throw AudioSampleError.fileNotFound(name)
             }

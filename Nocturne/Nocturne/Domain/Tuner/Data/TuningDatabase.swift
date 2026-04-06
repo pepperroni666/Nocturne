@@ -40,7 +40,7 @@ extension Tuner {
             }
         }
 
-        var instrument: Instrument {
+        nonisolated var instrument: Instrument {
             switch self {
             case .guitarStandard, .guitarDropD, .guitarOpenG: .guitar
             case .bassStandard, .bassDropD: .bass
@@ -86,7 +86,7 @@ extension Tuner {
             TuningPreset.allCases.filter { $0.instrument == instrument }
         }
 
-        static func defaultTuning(for instrument: Instrument) -> TuningPreset {
+        static nonisolated func defaultTuning(for instrument: Instrument) -> TuningPreset {
             switch instrument {
             case .guitar: .guitarStandard
             case .bass: .bassStandard

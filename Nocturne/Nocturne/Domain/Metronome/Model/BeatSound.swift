@@ -28,7 +28,7 @@ extension Metronome {
             }
         }
 
-        var accentFileName: String {
+        nonisolated var accentFileName: String {
             switch self {
             case .simple: return "simple_accent"
             case .simpleBright: return "simple_bright_accent"
@@ -43,7 +43,7 @@ extension Metronome {
             }
         }
 
-        var normalFileName: String {
+        nonisolated var normalFileName: String {
             switch self {
             case .simple: return "simple_normal"
             case .simpleBright: return "simple_bright_normal"

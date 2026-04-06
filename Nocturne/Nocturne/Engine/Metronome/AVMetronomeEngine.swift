@@ -25,11 +25,12 @@ extension Audio {
         func start(bpm: Int, beatsPerMeasure: Int, accentPattern: [Bool], beatSound: Metronome.BeatSound) async throws -> AsyncStream<Metronome.Tick> {
             stop()
 
-            try Audio.Session.activate()
+            try await Audio.Session.activate()
 
             let engine = AVAudioEngine()
-            let format = engine.outputNode.outputFormat(forBus: 0)
-            let sampleRate = format.sampleRate
+            let hardwareRate = engine.outputNode.outputFormat(forBus: 0).sampleRate
+            let sampleRate = hardwareRate > 0 ? hardwareRate : 44100.0
+            let format = AVAudioFormat(standardFormatWithSampleRate: sampleRate, channels: 2)!
 
             audioState.sampleRate = sampleRate
             audioState.samplesPerBeat = sampleRate * 60.0 / Double(bpm)
